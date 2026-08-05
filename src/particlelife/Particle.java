@@ -2,9 +2,16 @@ package particlelife;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,7 +24,7 @@ public class Particle {
     private double vx, vy;
     private double fx, fy;
 
-    private static int NB_TYPES = 3;
+    private static int NB_TYPES = 1;
     private int type;
 
     private static double constantG = 0.03;
@@ -26,7 +33,13 @@ public class Particle {
     private int id;
 
     // Particles closer than this will not interact.
-    private double neutralDistance = 1.0;
+    private double minRadius = 1.0;
+    // Particles farther away than this will not interact.
+    private double maxRadius = 5.0;
+
+    private static double[][] attractionArray = null;
+    private static double attractionCoef = 0.1;
+    private static double friction = 0;
 
     public Particle(double newX, double newY, double newRadius) {
         this.x = newX;
@@ -43,6 +56,7 @@ public class Particle {
         NB_PARTICLES_CREATED++;
 
         this.type = new Random().nextInt(NB_TYPES);
+        loadAttractions();
     }
 
     public void paint(Graphics g, double x0, double y0, double zoom) {
@@ -62,13 +76,13 @@ public class Particle {
 
         switch (this.type) {
         case 0:
-            result = Color.blue;
-            break;
-        case 1:
             result = Color.red;
             break;
-        case 2:
+        case 1:
             result = Color.green;
+            break;
+        case 2:
+            result = Color.blue;
             break;
         default:
             result = Color.gray;
@@ -86,9 +100,11 @@ public class Particle {
         if (p != this) {
             double distance = getDistance(p);
 
-            if (distance > neutralDistance) {
+            if (distance > minRadius && distance < maxRadius) {
 
-                double force = constantG * this.mass * p.mass / (distance * distance);
+                double factor = attractionArray[this.type][p.type] * attractionCoef;
+
+                double force = factor * constantG * this.mass * p.mass / (distance * distance);
                 double dx = (p.x - this.x) / distance;
                 double dy = (p.y - this.y) / distance;
 
@@ -107,6 +123,10 @@ public class Particle {
     protected void updateSpeed(double dt) {
         this.vx += this.fx * dt / mass;
         this.vy += this.fy * dt / mass;
+
+        // Friction
+        this.vx = (1 - friction) * this.vx;
+        this.vy = (1 - friction) * this.vy;
     }
 
     protected void move(double dt) {
@@ -120,6 +140,14 @@ public class Particle {
 
     public double getY() {
         return this.y;
+    }
+
+    protected void setX(double newX) {
+        x = newX;
+    }
+
+    protected void setY(double newY) {
+        y = newY;
     }
 
     public double getVx() {
@@ -136,5 +164,46 @@ public class Particle {
 
     protected void setVy(double newVy) {
         this.vy = newVy;
+    }
+
+    private static void loadAttractions() {
+        int nbTypes = 0;
+
+        if (attractionArray == null) {
+            String filename = "src/particlelife/particle_behavior.txt";
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
+
+                String line;
+                line = reader.readLine();
+                if (line.split("\t")[0].equals("nbTypes")) {
+                    nbTypes = Integer.valueOf(line.split("\t")[1]);
+                    attractionArray = new double[nbTypes][];
+                    for (int row = 0; row < nbTypes; row++) {
+                        attractionArray[row] = new double[nbTypes];
+                    }
+                    line = reader.readLine(); // Ignore this line, it is only the list of types numbers.
+                }
+                int row = 0;
+                while ((line = reader.readLine()) != null) {
+                    String[] split = line.split("\t");
+                    if (split[0].equals("friction")) {
+                        friction = Double.valueOf(split[1]);
+                        System.out.println("friction: " + friction);
+                    } else {
+                        for (int col = 0; col < nbTypes; col++) {
+                            double newVal = Double.valueOf(split[col + 1]);
+                            attractionArray[row][col] = newVal;
+                        }
+                    }
+                    row++;
+                }
+
+            } catch (FileNotFoundException ex) {
+                System.out.println("file " + filename + " not found.");
+            } catch (IOException ex) {
+                Logger.getLogger(Particle.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

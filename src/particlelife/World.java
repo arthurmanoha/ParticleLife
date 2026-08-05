@@ -24,13 +24,13 @@ public class World {
     private PropertyChangeSupport pcs;
     private int step = 0;
 
-    private int nbParticlesInit = 50;
+    private int nbParticlesInit = 3000;
 
     // Maximum x or y available to the particles
-    private double xMin = -10;
-    private double xMax = 10;
-    private double yMin = -5;
-    private double yMax = 5;
+    private double xMin = -30;
+    private double xMax = 30;
+    private double yMin = -15;
+    private double yMax = 15;
 
     public World() {
 
@@ -119,11 +119,22 @@ public class World {
     }
 
     private void computeWallCollisions(Particle p) {
-        if (p.getX() > xMax && p.getVx() > 0 || p.getX() < xMin && p.getVx() < 0) {
+        double margin = 0.1;
+        if (p.getX() > xMax && p.getVx() > 0) {
             p.setVx(-p.getVx());
+            p.setX(xMax - margin);
         }
-        if (p.getY() > yMax && p.getVy() > 0 || p.getY() < yMin && p.getVy() < 0) {
+        if (p.getX() < xMin && p.getVx() < 0) {
+            p.setVx(-p.getVx());
+            p.setX(xMin + margin);
+        }
+        if (p.getY() > yMax && p.getVy() > 0) {
             p.setVy(-p.getVy());
+            p.setY(yMax - margin);
+        }
+        if (p.getY() < yMin && p.getVy() < 0) {
+            p.setVy(-p.getVy());
+            p.setY(yMin + margin);
         }
     }
 
