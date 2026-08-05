@@ -36,7 +36,8 @@ public class ParticleLife {
         });
         toolPanel.add(playPauseButton);
 
-        JPanel graphicPanel = new GraphicPanel(world);
+        GraphicPanel graphicPanel = new GraphicPanel(world);
+        world.addPropertyChangeListener(graphicPanel);
 
         mainPanel.add(toolPanel, BorderLayout.SOUTH);
         mainPanel.add(graphicPanel, BorderLayout.CENTER);
