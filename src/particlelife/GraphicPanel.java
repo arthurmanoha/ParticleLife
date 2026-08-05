@@ -3,13 +3,15 @@ package particlelife;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 
 /**
  *
  * @author arthu
  */
-public class GraphicPanel extends JPanel {
+public class GraphicPanel extends JPanel implements PropertyChangeListener {
 
     private World w;
 
@@ -46,4 +48,10 @@ public class GraphicPanel extends JPanel {
         g.drawLine((int) x0, (int) (panelHeight - y0), (int) (x0), (int) ((panelHeight - (y0 + zoom * 10))));
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("step")) {
+            repaint();
+        }
+    }
 }
