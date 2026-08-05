@@ -1,5 +1,7 @@
 package particlelife;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -16,7 +18,13 @@ public class World {
 
     private boolean isRunning;
     private Timer timer;
-    private long timerPeriod;
+    private long timerPeriod = 10; // ms
+    private double dt = 0.1;
+
+    private PropertyChangeSupport pcs;
+    private int step = 0;
+
+    private int nbParticlesInit = 50;
 
     public World() {
 
@@ -24,7 +32,11 @@ public class World {
         initializeRandomParticles();
         isRunning = false;
         timer = null;
-        timerPeriod = 1000;
+        pcs = new PropertyChangeSupport(this);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
     }
 
     public ArrayList<Particle> getParticles() {
@@ -33,7 +45,7 @@ public class World {
 
     private void initializeRandomParticles() {
         Random r = new Random();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < nbParticlesInit; i++) {
 
             double x = r.nextDouble() * 100;
             double y = r.nextDouble() * 100;
@@ -74,6 +86,26 @@ public class World {
     }
 
     private void step() {
-        System.out.println("World.step()");
+        for (Particle p : allparticles) {
+            p.resetForces();
+        }
+
+        // Brute-force version, needs refining
+        for (Particle p : allparticles) {
+            for (Particle other : allparticles) {
+                p.computeForce(other);
+            }
+        }
+
+        for (Particle p : allparticles) {
+            p.updateSpeed(dt);
+        }
+        // Move particles
+        for (Particle p : allparticles) {
+            p.move(dt);
+        }
+
+        step++;
+        pcs.firePropertyChange("step", step - 1, step);
     }
 }

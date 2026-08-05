@@ -3,6 +3,8 @@ package particlelife;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -13,8 +15,8 @@ import javax.swing.JPanel;
 /**
  *
  * @author arthu
- */
-public class GraphicPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class GraphicPanel extends JPanel implements PropertyChangeListener, MouseListener, MouseMotionListener, MouseWheelListener {
+
 
     private World w;
 
@@ -63,6 +65,11 @@ public class GraphicPanel extends JPanel implements MouseListener, MouseMotionLi
     }
 
     @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("step")) {
+            repaint();
+        }
+    }
     public void mouseClicked(MouseEvent e) {
     }
 
