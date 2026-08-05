@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 /**
  *
  * @author arthu
+ */
 public class GraphicPanel extends JPanel implements PropertyChangeListener, MouseListener, MouseMotionListener, MouseWheelListener {
-
 
     private World w;
 
@@ -70,6 +70,8 @@ public class GraphicPanel extends JPanel implements PropertyChangeListener, Mous
             repaint();
         }
     }
+
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
