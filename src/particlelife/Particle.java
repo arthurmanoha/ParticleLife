@@ -2,6 +2,7 @@ package particlelife;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import static java.lang.Math.max;
 import static java.lang.Math.sqrt;
 import java.util.Random;
 
@@ -19,7 +20,7 @@ public class Particle {
     private static int NB_TYPES = 3;
     private int type;
 
-    private static double constantG = 1.0;
+    private static double constantG = 0.03;
 
     private static int NB_PARTICLES_CREATED = 0;
     private int id;
@@ -53,7 +54,7 @@ public class Particle {
         int rApp = (int) (this.radius * zoom);
 
         g.setColor(this.getColor());
-        g.fillOval(xApp - rApp, yApp - rApp, 2 * rApp, 2 * rApp);
+        g.fillOval(xApp - rApp, yApp - rApp, max(2 * rApp, 2), max(2 * rApp, 2));
     }
 
     private Color getColor() {
@@ -113,4 +114,27 @@ public class Particle {
         this.y += this.vy * dt;
     }
 
+    public double getX() {
+        return this.x;
+    }
+
+    public double getY() {
+        return this.y;
+    }
+
+    public double getVx() {
+        return this.vx;
+    }
+
+    public double getVy() {
+        return this.vy;
+    }
+
+    protected void setVx(double newVx) {
+        this.vx = newVx;
+    }
+
+    protected void setVy(double newVy) {
+        this.vy = newVy;
+    }
 }
