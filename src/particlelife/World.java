@@ -26,6 +26,12 @@ public class World {
 
     private int nbParticlesInit = 50;
 
+    // Maximum x or y available to the particles
+    private double xMin = -10;
+    private double xMax = 10;
+    private double yMin = -5;
+    private double yMax = 5;
+
     public World() {
 
         allparticles = new ArrayList<>();
@@ -47,10 +53,10 @@ public class World {
         Random r = new Random();
         for (int i = 0; i < nbParticlesInit; i++) {
 
-            double x = r.nextDouble() * 100;
-            double y = r.nextDouble() * 100;
+            double x = r.nextDouble() * (xMax - xMin) + xMin;
+            double y = r.nextDouble() * (yMax - yMin) + yMin;
 
-            allparticles.add(new Particle(x, y, 1));
+            allparticles.add(new Particle(x, y, 0.1));
         }
     }
 
@@ -105,7 +111,35 @@ public class World {
             p.move(dt);
         }
 
+        for (Particle p : allparticles) {
+            computeWallCollisions(p);
+        }
         step++;
         pcs.firePropertyChange("step", step - 1, step);
+    }
+
+    private void computeWallCollisions(Particle p) {
+        if (p.getX() > xMax && p.getVx() > 0 || p.getX() < xMin && p.getVx() < 0) {
+            p.setVx(-p.getVx());
+        }
+        if (p.getY() > yMax && p.getVy() > 0 || p.getY() < yMin && p.getVy() < 0) {
+            p.setVy(-p.getVy());
+        }
+    }
+
+    public double getXMin() {
+        return xMin;
+    }
+
+    public double getXMax() {
+        return xMax;
+    }
+
+    public double getYMin() {
+        return yMin;
+    }
+
+    public double getYMax() {
+        return yMax;
     }
 }

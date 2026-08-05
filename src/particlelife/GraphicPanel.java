@@ -20,8 +20,8 @@ public class GraphicPanel extends JPanel implements PropertyChangeListener, Mous
 
     private World w;
 
-    private int preferredWidth = 800;
-    private int preferredHeight = 600;
+    private int preferredWidth = 1200;
+    private int preferredHeight = 800;
 
     private double x0, y0, zoom;
 
@@ -32,9 +32,9 @@ public class GraphicPanel extends JPanel implements PropertyChangeListener, Mous
     public GraphicPanel(World world) {
         this.w = world;
         setPreferredSize(new Dimension(preferredWidth, preferredHeight));
-        x0 = 10;
-        y0 = 30;
-        zoom = 6;
+        x0 = 600;
+        y0 = 417;
+        zoom = 59.1;
         xMouse = 0;
         yMouse = 0;
         addMouseListener(this);
@@ -45,20 +45,30 @@ public class GraphicPanel extends JPanel implements PropertyChangeListener, Mous
 
     @Override
     public void paintComponent(Graphics g) {
-        g.setColor(Color.black);
-        g.fillRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
+//        System.out.println("x0: " + x0 + ", y0: " + y0 + ", zoom: " + zoom);
 
+        panelHeight = g.getClipBounds().height;
+
+        // Erase background
+        g.setColor(Color.black);
+        g.fillRect(0, 0, g.getClipBounds().width, panelHeight);
+
+        // Paint world borders
+        g.setColor(Color.gray);
+        g.fillRect((int) (x0 + w.getXMin() * zoom),
+                (int) (panelHeight - (y0 + w.getYMax() * zoom)),
+                (int) ((w.getXMax() - w.getXMin()) * zoom),
+                (int) ((w.getYMax() - w.getYMin()) * zoom));
         for (Particle p : w.getParticles()) {
             p.paint(g, x0, y0, zoom);
         }
 
-        paintReferential(g, x0, y0, zoom);
-        panelHeight = g.getClipBounds().height;
+//        paintReferential(g, x0, y0, zoom);
     }
 
     private void paintReferential(Graphics g, double x0, double y0, double zoom) {
         g.setColor(Color.white);
-        int panelHeight = g.getClipBounds().height;
+        panelHeight = g.getClipBounds().height;
 
         g.drawLine((int) x0, (int) (panelHeight - y0), (int) (x0 + zoom * 10), (int) (panelHeight - y0));
         g.drawLine((int) x0, (int) (panelHeight - y0), (int) (x0), (int) ((panelHeight - (y0 + zoom * 10))));
